@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFS Login | Acesso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
+        
+        body { 
+            background-color: #000000; 
+            color: #ffffff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Inputs conforme a imagem */
+        .input-field {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 1.2rem;
+            padding: 1.1rem 1.5rem;
+            width: 100%;
+            outline: none;
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Brilho circular vermelho */
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        #logo-login {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: white;
+            position: relative;
+            z-index: 1;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        /* Botão Entrar */
+        .btn-entrar {
+            background-color: #b91c1c;
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            padding: 1.1rem;
+            border-radius: 1.2rem;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-sm px-10 pt-12 flex flex-col items-center">
+        
+        <button onclick="location.href='index.html'" class="self-start text-[10px] font-extrabold tracking-[0.2em] text-gray-400 uppercase flex items-center gap-2 mb-20">
+            <i class="fa-solid fa-arrow-left text-[8px]"></i> VOLTAR
+        </button>
+
+        <p class="text-[7px] font-bold tracking-[0.4em] text-gray-600 uppercase mb-8">
+            — VOLTAR À LOJA
+        </p>
+
+        <div class="relative mb-10">
+            <div class="logo-glow"></div>
+            <img id="logo-login" src="logo.png" alt="Logo">
+        </div>
+
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase leading-none">
+                AFS <span class="text-red-700">LOGIN</span>
+            </h1>
+            <p class="text-[8px] text-gray-500 uppercase tracking-[0.3em] mt-3 font-bold">
+                ACESSO ADMINISTRATIVO
+            </p>
+        </div>
+
+        <div class="w-full space-y-4">
+            <input type="email" id="email" placeholder="E-MAIL" class="input-field">
+
+            <div class="relative">
+                <input type="password" id="senha" placeholder="SENHA" class="input-field pr-14">
+                <button type="button" onclick="togglePassword()" class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-600">
+                    <i id="eye-icon" class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+            
+            <button onclick="realizarLogin()" class="btn-entrar shadow-2xl shadow-red-900/20">
+                ENTRAR NO PAINEL
+            </button>
+
+            <p class="text-center mt-12 text-[8px] text-gray-800 font-bold uppercase tracking-[0.3em]">
+                AFS MULTISERVICE © 2026
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Sincroniza o logo com o que foi definido no Admin
+        window.onload = () => {
+            const logo = localStorage.getItem('afs_logo');
+            if(logo) document.getElementById('logo-login').src = logo;
+        }
+
+        function togglePassword() {
+            const s = document.getElementById('senha');
+            const i = document.getElementById('eye-icon');
+            if (s.type === 'password') {
+                s.type = 'text';
+                i.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                s.type = 'password';
+                i.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function realizarLogin() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            if(email === 'info@asf-multiservice.co.mz' && senha === 'AFSADMIN2K26') {
+                location.href = 'admin.html';
+            } else {
+                alert('Acesso negado!');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | AFS Multiservice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: white; }
+        .sidebar-item.active { background: rgba(255, 0, 0, 0.1); color: #ff0000; }
+        .hidden { display: none; }
+        input[type="file"]::-webkit-file-upload-button { background: #ff0000; border: none; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="p-5 border-b border-white/5 flex justify-between items-center bg-black/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <img id="logo-admin" src="logo.png" class="h-10 w-10 rounded-full bg-white object-contain border border-red-600">
+            <span class="text-[10px] font-black uppercase text-red-600 italic">AFS Admin</span>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <nav class="w-20 lg:w-64 border-r border-white/5 p-4 flex flex-col space-y-2">
+            <button onclick="showTab('tab-pedidos', this)" class="sidebar-item active w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-receipt"></i> <span class="hidden lg:block text-xs font-bold uppercase">Pedidos</span></button>
+            <button onclick="showTab('tab-inventario', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-boxes-stacked"></i> <span class="hidden lg:block text-xs font-bold uppercase">Gerir Itens</span></button>
+            <button onclick="showTab('tab-add', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-plus-circle"></i> <span class="hidden lg:block text-xs font-bold uppercase">Novo</span></button>
+            <button onclick="showTab('tab-config', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-gear"></i> <span class="hidden lg:block text-xs font-bold uppercase">Perfil</span></button>
+            <div class="mt-auto pt-4 border-t border-white/5">
+                <button onclick="location.href='index.html'" class="w-full p-4 text-gray-500 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </nav>
+
+        <main class="flex-1 p-6 overflow-y-auto">
+            
+            <div id="tab-pedidos" class="tab-content space-y-4">
+                <h2 class="text-xl font-black italic uppercase italic">Pedidos</h2>
+                <div id="lista-pedidos" class="space-y-4"></div>
+            </div>
+
+            <div id="tab-inventario" class="tab-content hidden space-y-4">
+                <h2 class="text-xl font-black italic uppercase italic">Lista de Produtos</h2>
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Clique no ícone de lixo para remover</p>
+                <div id="lista-gestao" class="space-y-3"></div>
+            </div>
+
+            <div id="tab-add" class="tab-content hidden">
+                <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
+                    <h2 class="text-sm font-black uppercase text-red-600">Novo Produto</h2>
+                    <input type="text" id="p-nome" placeholder="NOME DO PRODUTO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
+                    <input type="text" id="p-desc" placeholder="DESCRIÇÃO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
+                    <input type="text" id="p-preco" placeholder="PREÇO (MT)" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
+                    <label class="block text-[9px] text-gray-500 uppercase font-bold ml-2">Foto do Produto:</label>
+                    <input type="file" id="p-foto" accept="image/*" class="text-[10px] ml-2">
+                    <button id="btn-salvar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase shadow-lg shadow-red-600/20 mt-4">Publicar Produto</button>
+                </div>
+            </div>
+
+            <div id="tab-config" class="tab-content hidden space-y-6">
+                <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
+                    <h2 class="text-sm font-black uppercase text-red-600">Trocar Logotipo</h2>
+                    <input type="file" id="perfil-foto" accept="image/*" class="text-[10px]">
+                    <button id="btn-perfil" class="w-full bg-white text-black p-4 rounded-xl font-black text-xs uppercase">Atualizar Logo Global</button>
+                    
+                    <div class="pt-6">
+                        <h2 class="text-sm font-black uppercase text-red-600">Texto do Balão</h2>
+                        <input type="text" id="input-aviso" placeholder="EX: ENTREGAS GRÁTIS" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold mt-2">
+                        <button id="btn-aviso" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase mt-4">Salvar Aviso</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn8kvmsWdPTc_gSxz5_u-bs3NJrmzwmE0",
+            authDomain: "afsmultiservices.firebaseapp.com",
+            projectId: "afsmultiservices",
+            storageBucket: "afsmultiservices.firebasestorage.app",
+            messagingSenderId: "477881971322",
+            appId: "1:477881971322:web:bd25dfe8a9058c708241c3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Switch Tabs
+        window.showTab = (id, btn) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.remove('hidden');
+            if(btn) btn.classList.add('active');
+        };
+
+        // --- GESTÃO DE PRODUTOS (LISTAR E TIRAR) ---
+        onSnapshot(collection(db, "produtos"), (snapshot) => {
+            const container = document.getElementById('lista-gestao');
+            container.innerHTML = "";
+            snapshot.forEach(d => {
+                const p = d.data();
+                container.innerHTML += `
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <div class="flex items-center gap-4">
+                        <img src="${p.foto}" class="w-12 h-12 rounded-xl object-cover">
+                        <div>
+                            <p class="text-[10px] font-black uppercase">${p.nome}</p>
+                            <p class="text-[9px] text-red-600 font-bold">${p.preco} MT</p>
+                        </div>
+                    </div>
+                    <button onclick="removerItem('${d.id}')" class="text-red-600 p-2 hover:bg-red-600/10 rounded-lg">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>`;
+            });
+        });
+
+        window.removerItem = async (id) => {
+            if(confirm("Deseja tirar este produto da loja?")) {
+                await deleteDoc(doc(db, "produtos", id));
+            }
+        };
+
+        // --- ADICIONAR PRODUTO ---
+        document.getElementById('btn-salvar').onclick = async () => {
+            const nome = document.getElementById('p-nome').value;
+            const desc = document.getElementById('p-desc').value;
+            const preco = document.getElementById('p-preco').value;
+            const file = document.getElementById('p-foto').files[0];
+
+            if(!file || !nome || !preco) return alert("Preencha Nome, Preço e selecione a Foto!");
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                try {
+                    await addDoc(collection(db, "produtos"), {
+                        nome, desc, preco, foto: reader.result, dataCriacao: Date.now()
+                    });
+                    alert("Produto publicado com sucesso!");
+                    document.getElementById('p-nome').value = "";
+                    document.getElementById('p-desc').value = "";
+                    document.getElementById('p-preco').value = "";
+                } catch (e) { alert("Erro ao salvar: " + e.message); }
+            };
+        };
+
+        // --- PEDIDOS ---
+        onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
+            const container = document.getElementById('lista-pedidos');
+            container.innerHTML = "";
+            snapshot.forEach(doc => {
+                const p = doc.data();
+                container.innerHTML += `
+                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10">
+                    <p class="text-[8px] text-red-600 font-bold uppercase italic">${p.data}</p>
+                    <h3 class="font-black text-white text-sm uppercase">${p.itens}</h3>
+                    <p class="text-[10px] text-gray-500 mt-2">CLI: ${p.cliente} | TEL: ${p.tel}</p>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">LOCAL: ${p.local} | QTD: ${p.qtd}</p>
+                </div>`;
+            });
+        });
+
+        // --- CONFIGURAÇÕES ---
+        document.getElementById('btn-perfil').onclick = async () => {
+            const file = document.getElementById('perfil-foto').files[0];
+            if(!file) return alert("Selecione uma imagem!");
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                await setDoc(doc(db, "config", "main"), { logo: reader.result }, { merge: true });
+                alert("Logotipo atualizado!");
+            };
+        };
+
+        document.getElementById('btn-aviso').onclick = async () => {
+            const txt = document.getElementById('input-aviso').value;
+            await setDoc(doc(db, "config", "main"), { aviso: txt }, { merge: true });
+            alert("Aviso guardado!");
+        };
+
+        onSnapshot(doc(db, "config", "main"), (d) => {
+            if(d.exists() && d.data().logo) document.getElementById('logo-admin').src = d.data().logo;
+        });
+    </script>
+</body>
+</html>
