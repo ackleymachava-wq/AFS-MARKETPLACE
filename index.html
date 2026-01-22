@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AFS Marketplace | Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
@@ -14,7 +15,9 @@
         .dream-bubble::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.1); border-radius: 50%; width: 15px; height: 15px; bottom: -20px; left: 30px; }
         .hidden { display: none; }
         .cat-btn.active { background: #dc2626; color: white; border-color: #dc2626; }
-        .badge-cat { background: rgba(220, 38, 38, 0.15); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.3); }
+        
+        /* Estilo para suavizar a entrada antes da animação carregar */
+        .product-card { opacity: 0; }
     </style>
 </head>
 <body class="pb-32">
@@ -31,7 +34,7 @@
         </div>
     </header>
 
-    <div class="px-6 mt-6 space-y-4">
+    <div class="px-6 mt-6 space-y-4 reveal-top">
         <div class="glass flex items-center px-4 py-3 rounded-2xl border border-white/10">
             <i class="fa-solid fa-magnifying-glass text-gray-500 mr-3 text-sm"></i>
             <input type="text" id="input-busca" onkeyup="buscarLocal()" placeholder="PESQUISAR..." class="bg-transparent w-full text-[10px] font-bold outline-none uppercase text-white">
@@ -42,15 +45,14 @@
         </div>
     </div>
 
-    <div class="flex justify-center mt-2">
+    <div class="flex justify-center mt-2 reveal-top">
         <div class="dream-bubble">
             <p id="txt-aviso" class="text-[9px] font-bold uppercase tracking-widest text-white text-center italic">Carregando...</p>
         </div>
     </div>
 
     <section id="produtos-grid" class="p-6 grid grid-cols-2 gap-5">
-        <p class="col-span-2 text-center text-gray-600 text-xs italic mt-10">Buscando produtos no servidor...</p>
-    </section>
+        </section>
 
     <div id="modal-carrinho" class="fixed inset-0 z-[100] glass flex items-end justify-center hidden">
         <div class="bg-[#0a0a0a] w-full max-h-[80vh] rounded-t-[3rem] p-8 overflow-y-auto border-t border-white/10 shadow-2xl">
@@ -104,6 +106,15 @@
         let carrinho = [];
         let categoriaAtiva = "TODOS";
 
+        // Configuração Inicial do ScrollReveal
+        const sr = ScrollReveal({
+            origin: 'bottom',
+            distance: '30px',
+            duration: 1000,
+            delay: 200,
+            reset: false // Para animar apenas uma vez ao descer
+        });
+
         onSnapshot(collection(db, "categorias"), (snapshot) => {
             const container = document.getElementById('lista-categorias');
             container.innerHTML = `<button onclick="filtrarCategoria('TODOS', this)" class="cat-btn ${categoriaAtiva === 'TODOS' ? 'active' : ''} flex-shrink-0 px-4 py-2 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest transition-all">TODOS</button>`;
@@ -111,6 +122,7 @@
                 const cat = doc.data().nome;
                 container.innerHTML += `<button onclick="filtrarCategoria('${cat}', this)" class="cat-btn ${categoriaAtiva === cat ? 'active' : ''} flex-shrink-0 px-4 py-2 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest transition-all">${cat}</button>`;
             });
+            sr.reveal('.cat-btn', { interval: 100 });
         });
 
         window.filtrarCategoria = (cat, btn) => {
@@ -141,13 +153,11 @@
                 }
 
                 for (let categoria in categoriasMap) {
-                    // Título da Categoria
                     const title = document.createElement('div');
-                    title.className = "col-span-2 mt-4 mb-2 border-l-4 border-red-600 pl-3";
+                    title.className = "col-span-2 mt-4 mb-2 border-l-4 border-red-600 pl-3 reveal-cat";
                     title.innerHTML = `<h2 class="text-sm font-black text-white uppercase italic tracking-widest">${categoria}</h2>`;
                     grid.appendChild(title);
 
-                    // Produtos da Categoria
                     categoriasMap[categoria].forEach(p => {
                         const card = document.createElement('div');
                         card.className = "bg-[#0f0f0f] border border-white/5 rounded-[2.5rem] p-4 flex flex-col justify-between product-card";
@@ -164,6 +174,10 @@
                         grid.appendChild(card);
                     });
                 }
+                
+                // DISPARAR ANIMAÇÃO NOS NOVOS ELEMENTOS
+                sr.reveal('.reveal-cat', { origin: 'left', distance: '50px' });
+                sr.reveal('.product-card', { interval: 100, scale: 0.9, opacity: 0 });
             });
         }
 
@@ -175,8 +189,10 @@
                 if(data.aviso) document.getElementById('txt-aviso').innerText = data.aviso;
                 if(data.logo) document.getElementById('logo-markt').src = data.logo;
             });
+            sr.reveal('.reveal-top', { origin: 'top' });
         });
 
+        // Funções de Carrinho (Mantidas conforme original)
         window.addCart = (nome, preco, foto) => {
             carrinho.push({nome, preco, foto});
             document.getElementById('cart-count').innerText = carrinho.length;
@@ -232,4 +248,3 @@
     </script>
 </body>
 </html>
-
