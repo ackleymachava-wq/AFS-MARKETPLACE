@@ -37,7 +37,9 @@
         <main class="flex-1 p-6 overflow-y-auto">
             
             <div id="tab-pedidos" class="tab-content space-y-4">
-                <h2 class="text-xl font-black italic uppercase">Pedidos</h2>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-black italic uppercase">Pedidos Ativos</h2>
+                </div>
                 <div id="lista-pedidos" class="space-y-4"></div>
             </div>
 
@@ -46,11 +48,9 @@
                     <h2 class="text-xl font-black italic uppercase">Produtos em Loja</h2>
                     <div id="lista-gestao" class="space-y-3 mt-4"></div>
                 </div>
-
                 <div class="pt-8 border-t border-white/10">
                     <h2 class="text-xl font-black italic uppercase text-red-600">Categorias Ativas</h2>
-                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-4">Eliminar categorias vazias ou antigas</p>
-                    <div id="lista-categorias-admin" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    <div id="lista-categorias-admin" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4"></div>
                 </div>
             </div>
 
@@ -62,12 +62,10 @@
                     <input type="text" id="p-preco" placeholder="PREÇO (MT)" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
                     
                     <div class="space-y-2">
-                        <label class="block text-[9px] text-gray-500 uppercase font-bold ml-2">Categoria:</label>
                         <select id="p-cat-select" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
                             <option value="">Escolher Categoria Existente</option>
                         </select>
-                        <p class="text-center text-[8px] text-gray-600 font-bold">OU</p>
-                        <input type="text" id="p-cat-nova" placeholder="CRIAR NOVA CATEGORIA" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
+                        <input type="text" id="p-cat-nova" placeholder="OU CRIAR NOVA CATEGORIA" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
                     </div>
 
                     <label class="block text-[9px] text-gray-500 uppercase font-bold ml-2">Foto do Produto:</label>
@@ -78,13 +76,12 @@
 
             <div id="tab-config" class="tab-content hidden space-y-6">
                 <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
-                    <h2 class="text-sm font-black uppercase text-red-600">Trocar Logotipo</h2>
+                    <h2 class="text-sm font-black uppercase text-red-600">Aparência Global</h2>
                     <input type="file" id="perfil-foto" accept="image/*" class="text-[10px]">
-                    <button id="btn-perfil" class="w-full bg-white text-black p-4 rounded-xl font-black text-xs uppercase">Atualizar Logo Global</button>
+                    <button id="btn-perfil" class="w-full bg-white text-black p-4 rounded-xl font-black text-xs uppercase">Atualizar Logo</button>
                     
-                    <div class="pt-6">
-                        <h2 class="text-sm font-black uppercase text-red-600">Texto do Balão</h2>
-                        <input type="text" id="input-aviso" placeholder="EX: ENTREGAS GRÁTIS" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold mt-2">
+                    <div class="pt-6 border-t border-white/5">
+                        <input type="text" id="input-aviso" placeholder="TEXTO DO BALÃO DE AVISO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold mt-2">
                         <button id="btn-aviso" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase mt-4">Salvar Aviso</button>
                     </div>
                 </div>
@@ -115,33 +112,52 @@
             if(btn) btn.classList.add('active');
         };
 
-        // --- GESTÃO DE CATEGORIAS (LISTAR E ELIMINAR) ---
-        onSnapshot(collection(db, "categorias"), (snapshot) => {
-            const select = document.getElementById('p-cat-select');
-            const listaAdmin = document.getElementById('lista-categorias-admin');
-            
-            select.innerHTML = `<option value="">Escolher Categoria Existente</option>`;
-            listaAdmin.innerHTML = "";
-
+        // --- GESTÃO DE PEDIDOS (COM FUNÇÃO DE ELIMINAR) ---
+        onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
+            const container = document.getElementById('lista-pedidos');
+            container.innerHTML = "";
             snapshot.forEach(d => {
-                const cat = d.data().nome;
-                // Preencher Select
-                select.innerHTML += `<option value="${cat}">${cat}</option>`;
-                // Preencher Lista de Gestão
-                listaAdmin.innerHTML += `
-                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] font-black uppercase tracking-widest">${cat}</span>
-                    <button onclick="removerCategoria('${d.id}')" class="text-red-600 hover:bg-red-600/10 p-2 rounded-lg transition">
+                const p = d.data();
+                container.innerHTML += `
+                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex justify-between items-start">
+                    <div class="space-y-1">
+                        <p class="text-[8px] text-red-600 font-bold uppercase italic">${p.data}</p>
+                        <h3 class="font-black text-white text-sm uppercase">${p.itens}</h3>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold">CLIENTE: ${p.cliente} | TEL: ${p.tel}</p>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-tighter">LOCAL: ${p.local} | QTD: ${p.qtd}</p>
+                    </div>
+                    <button onclick="removerPedido('${d.id}')" class="bg-red-600/10 text-red-600 p-3 rounded-2xl hover:bg-red-600 hover:text-white transition-all">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>`;
             });
         });
 
-        window.removerCategoria = async (id) => {
-            if(confirm("Deseja eliminar esta categoria? Produtos associados a ela ficarão sem categoria no Marketplace.")) {
-                await deleteDoc(doc(db, "categorias", id));
+        window.removerPedido = async (id) => {
+            if(confirm("Deseja apagar este pedido do histórico?")) {
+                await deleteDoc(doc(db, "pedidos", id));
             }
+        };
+
+        // --- GESTÃO DE CATEGORIAS ---
+        onSnapshot(collection(db, "categorias"), (snapshot) => {
+            const select = document.getElementById('p-cat-select');
+            const listaAdmin = document.getElementById('lista-categorias-admin');
+            select.innerHTML = `<option value="">Escolher Categoria Existente</option>`;
+            listaAdmin.innerHTML = "";
+            snapshot.forEach(d => {
+                const cat = d.data().nome;
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+                listaAdmin.innerHTML += `
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] font-black uppercase tracking-widest">${cat}</span>
+                    <button onclick="removerCategoria('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`;
+            });
+        });
+
+        window.removerCategoria = async (id) => {
+            if(confirm("Remover esta categoria?")) { await deleteDoc(doc(db, "categorias", id)); }
         };
 
         // --- GESTÃO DE PRODUTOS ---
@@ -156,23 +172,19 @@
                         <img src="${p.foto}" class="w-12 h-12 rounded-xl object-cover">
                         <div>
                             <p class="text-[10px] font-black uppercase">${p.nome}</p>
-                            <p class="text-[8px] text-red-600 font-bold uppercase">${p.categoria || 'Sem Categoria'}</p>
+                            <p class="text-[8px] text-red-600 font-bold uppercase">${p.categoria || 'Geral'}</p>
                         </div>
                     </div>
-                    <button onclick="removerItem('${d.id}')" class="text-red-600 p-2">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    <button onclick="removerItem('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash-can"></i></button>
                 </div>`;
             });
         });
 
         window.removerItem = async (id) => {
-            if(confirm("Deseja tirar este produto da loja?")) {
-                await deleteDoc(doc(db, "produtos", id));
-            }
+            if(confirm("Apagar produto da loja?")) { await deleteDoc(doc(db, "produtos", id)); }
         };
 
-        // --- ADICIONAR PRODUTO ---
+        // --- PUBLICAR PRODUTO ---
         document.getElementById('btn-salvar').onclick = async () => {
             const nome = document.getElementById('p-nome').value.toUpperCase();
             const desc = document.getElementById('p-desc').value.toUpperCase();
@@ -180,40 +192,21 @@
             const catSelect = document.getElementById('p-cat-select').value;
             const catNova = document.getElementById('p-cat-nova').value.toUpperCase().trim();
             const file = document.getElementById('p-foto').files[0];
-
             let categoriaFinal = catNova || catSelect;
 
-            if(!file || !nome || !preco || !categoriaFinal) return alert("Preencha todos os campos!");
+            if(!file || !nome || !preco || !categoriaFinal) return alert("Dados incompletos!");
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async () => {
-                if(catNova) {
-                    await addDoc(collection(db, "categorias"), { nome: catNova });
-                }
+                if(catNova) { await addDoc(collection(db, "categorias"), { nome: catNova }); }
                 await addDoc(collection(db, "produtos"), {
                     nome, desc, preco, categoria: categoriaFinal, foto: reader.result, dataCriacao: Date.now()
                 });
-                alert("Produto publicado!");
+                alert("Publicado com sucesso!");
                 location.reload();
             };
         };
-
-        // --- PEDIDOS ---
-        onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
-            const container = document.getElementById('lista-pedidos');
-            container.innerHTML = "";
-            snapshot.forEach(doc => {
-                const p = doc.data();
-                container.innerHTML += `
-                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10">
-                    <p class="text-[8px] text-red-600 font-bold uppercase italic">${p.data}</p>
-                    <h3 class="font-black text-white text-sm uppercase">${p.itens}</h3>
-                    <p class="text-[10px] text-gray-500 mt-2">CLI: ${p.cliente} | TEL: ${p.tel}</p>
-                    <p class="text-[10px] text-gray-500 uppercase font-bold">LOCAL: ${p.local} | QTD: ${p.qtd}</p>
-                </div>`;
-            });
-        });
 
         // --- LOGO E AVISO ---
         document.getElementById('btn-perfil').onclick = async () => {
