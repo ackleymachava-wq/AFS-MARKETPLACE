@@ -37,22 +37,39 @@
         <main class="flex-1 p-6 overflow-y-auto">
             
             <div id="tab-pedidos" class="tab-content space-y-4">
-                <h2 class="text-xl font-black italic uppercase italic">Pedidos</h2>
+                <h2 class="text-xl font-black italic uppercase">Pedidos</h2>
                 <div id="lista-pedidos" class="space-y-4"></div>
             </div>
 
-            <div id="tab-inventario" class="tab-content hidden space-y-4">
-                <h2 class="text-xl font-black italic uppercase italic">Lista de Produtos</h2>
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Clique no ícone de lixo para remover</p>
-                <div id="lista-gestao" class="space-y-3"></div>
+            <div id="tab-inventario" class="tab-content hidden space-y-8">
+                <div>
+                    <h2 class="text-xl font-black italic uppercase">Produtos em Loja</h2>
+                    <div id="lista-gestao" class="space-y-3 mt-4"></div>
+                </div>
+
+                <div class="pt-8 border-t border-white/10">
+                    <h2 class="text-xl font-black italic uppercase text-red-600">Categorias Ativas</h2>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-4">Eliminar categorias vazias ou antigas</p>
+                    <div id="lista-categorias-admin" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                </div>
             </div>
 
             <div id="tab-add" class="tab-content hidden">
                 <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
                     <h2 class="text-sm font-black uppercase text-red-600">Novo Produto</h2>
-                    <input type="text" id="p-nome" placeholder="NOME DO PRODUTO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
-                    <input type="text" id="p-desc" placeholder="DESCRIÇÃO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
+                    <input type="text" id="p-nome" placeholder="NOME DO PRODUTO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
+                    <input type="text" id="p-desc" placeholder="DESCRIÇÃO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
                     <input type="text" id="p-preco" placeholder="PREÇO (MT)" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
+                    
+                    <div class="space-y-2">
+                        <label class="block text-[9px] text-gray-500 uppercase font-bold ml-2">Categoria:</label>
+                        <select id="p-cat-select" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
+                            <option value="">Escolher Categoria Existente</option>
+                        </select>
+                        <p class="text-center text-[8px] text-gray-600 font-bold">OU</p>
+                        <input type="text" id="p-cat-nova" placeholder="CRIAR NOVA CATEGORIA" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
+                    </div>
+
                     <label class="block text-[9px] text-gray-500 uppercase font-bold ml-2">Foto do Produto:</label>
                     <input type="file" id="p-foto" accept="image/*" class="text-[10px] ml-2">
                     <button id="btn-salvar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase shadow-lg shadow-red-600/20 mt-4">Publicar Produto</button>
@@ -91,7 +108,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Switch Tabs
         window.showTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
@@ -99,7 +115,36 @@
             if(btn) btn.classList.add('active');
         };
 
-        // --- GESTÃO DE PRODUTOS (LISTAR E TIRAR) ---
+        // --- GESTÃO DE CATEGORIAS (LISTAR E ELIMINAR) ---
+        onSnapshot(collection(db, "categorias"), (snapshot) => {
+            const select = document.getElementById('p-cat-select');
+            const listaAdmin = document.getElementById('lista-categorias-admin');
+            
+            select.innerHTML = `<option value="">Escolher Categoria Existente</option>`;
+            listaAdmin.innerHTML = "";
+
+            snapshot.forEach(d => {
+                const cat = d.data().nome;
+                // Preencher Select
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+                // Preencher Lista de Gestão
+                listaAdmin.innerHTML += `
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] font-black uppercase tracking-widest">${cat}</span>
+                    <button onclick="removerCategoria('${d.id}')" class="text-red-600 hover:bg-red-600/10 p-2 rounded-lg transition">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>`;
+            });
+        });
+
+        window.removerCategoria = async (id) => {
+            if(confirm("Deseja eliminar esta categoria? Produtos associados a ela ficarão sem categoria no Marketplace.")) {
+                await deleteDoc(doc(db, "categorias", id));
+            }
+        };
+
+        // --- GESTÃO DE PRODUTOS ---
         onSnapshot(collection(db, "produtos"), (snapshot) => {
             const container = document.getElementById('lista-gestao');
             container.innerHTML = "";
@@ -111,10 +156,10 @@
                         <img src="${p.foto}" class="w-12 h-12 rounded-xl object-cover">
                         <div>
                             <p class="text-[10px] font-black uppercase">${p.nome}</p>
-                            <p class="text-[9px] text-red-600 font-bold">${p.preco} MT</p>
+                            <p class="text-[8px] text-red-600 font-bold uppercase">${p.categoria || 'Sem Categoria'}</p>
                         </div>
                     </div>
-                    <button onclick="removerItem('${d.id}')" class="text-red-600 p-2 hover:bg-red-600/10 rounded-lg">
+                    <button onclick="removerItem('${d.id}')" class="text-red-600 p-2">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>`;
@@ -129,25 +174,28 @@
 
         // --- ADICIONAR PRODUTO ---
         document.getElementById('btn-salvar').onclick = async () => {
-            const nome = document.getElementById('p-nome').value;
-            const desc = document.getElementById('p-desc').value;
+            const nome = document.getElementById('p-nome').value.toUpperCase();
+            const desc = document.getElementById('p-desc').value.toUpperCase();
             const preco = document.getElementById('p-preco').value;
+            const catSelect = document.getElementById('p-cat-select').value;
+            const catNova = document.getElementById('p-cat-nova').value.toUpperCase().trim();
             const file = document.getElementById('p-foto').files[0];
 
-            if(!file || !nome || !preco) return alert("Preencha Nome, Preço e selecione a Foto!");
+            let categoriaFinal = catNova || catSelect;
+
+            if(!file || !nome || !preco || !categoriaFinal) return alert("Preencha todos os campos!");
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async () => {
-                try {
-                    await addDoc(collection(db, "produtos"), {
-                        nome, desc, preco, foto: reader.result, dataCriacao: Date.now()
-                    });
-                    alert("Produto publicado com sucesso!");
-                    document.getElementById('p-nome').value = "";
-                    document.getElementById('p-desc').value = "";
-                    document.getElementById('p-preco').value = "";
-                } catch (e) { alert("Erro ao salvar: " + e.message); }
+                if(catNova) {
+                    await addDoc(collection(db, "categorias"), { nome: catNova });
+                }
+                await addDoc(collection(db, "produtos"), {
+                    nome, desc, preco, categoria: categoriaFinal, foto: reader.result, dataCriacao: Date.now()
+                });
+                alert("Produto publicado!");
+                location.reload();
             };
         };
 
@@ -167,7 +215,7 @@
             });
         });
 
-        // --- CONFIGURAÇÕES ---
+        // --- LOGO E AVISO ---
         document.getElementById('btn-perfil').onclick = async () => {
             const file = document.getElementById('perfil-foto').files[0];
             if(!file) return alert("Selecione uma imagem!");
@@ -175,14 +223,14 @@
             reader.readAsDataURL(file);
             reader.onload = async () => {
                 await setDoc(doc(db, "config", "main"), { logo: reader.result }, { merge: true });
-                alert("Logotipo atualizado!");
+                alert("Logo atualizada!");
             };
         };
 
         document.getElementById('btn-aviso').onclick = async () => {
             const txt = document.getElementById('input-aviso').value;
             await setDoc(doc(db, "config", "main"), { aviso: txt }, { merge: true });
-            alert("Aviso guardado!");
+            alert("Aviso salvo!");
         };
 
         onSnapshot(doc(db, "config", "main"), (d) => {
