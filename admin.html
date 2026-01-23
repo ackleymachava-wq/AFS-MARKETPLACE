@@ -3,98 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | AFS Multiservice</title>
+    <title>Admin Elite | AFS Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: white; }
-        .sidebar-item.active { background: rgba(255, 0, 0, 0.1); color: #ff0000; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050505; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar-item.active { background: rgba(220, 38, 38, 0.1); color: #dc2626; border-right: 4px solid #dc2626; }
         .hidden { display: none; }
-        input[type="file"]::-webkit-file-upload-button { background: #ff0000; border: none; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+        input, select, textarea { background: #000 !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; outline: none; }
+        textarea { resize: none; }
+        option { background: #000; color: white; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <header class="p-5 border-b border-white/5 flex justify-between items-center bg-black/50 backdrop-blur-md sticky top-0 z-50">
-        <div class="flex items-center gap-3">
+    <header class="p-6 border-b border-white/5 flex justify-between items-center glass sticky top-0 z-50">
+        <div class="flex items-center gap-4">
             <img id="logo-admin" src="logo.png" class="h-10 w-10 rounded-full bg-white object-contain border border-red-600">
-            <span class="text-[10px] font-black uppercase text-red-600 italic">AFS Admin</span>
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 italic">AFS Admin Elite</span>
         </div>
+        <button onclick="location.href='index.html'" class="text-[9px] font-black bg-white/5 px-4 py-2 rounded-full uppercase">Sair</button>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        <nav class="w-20 lg:w-64 border-r border-white/5 p-4 flex flex-col space-y-2">
-            <button onclick="showTab('tab-pedidos', this)" class="sidebar-item active w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-receipt"></i> <span class="hidden lg:block text-xs font-bold uppercase">Pedidos</span></button>
-            <button onclick="showTab('tab-inventario', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-boxes-stacked"></i> <span class="hidden lg:block text-xs font-bold uppercase">Gerir Itens</span></button>
-            <button onclick="showTab('tab-add', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-plus-circle"></i> <span class="hidden lg:block text-xs font-bold uppercase">Novo</span></button>
-            <button onclick="showTab('tab-config', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-3"><i class="fa-solid fa-gear"></i> <span class="hidden lg:block text-xs font-bold uppercase">Perfil</span></button>
-            <div class="mt-auto pt-4 border-t border-white/5">
-                <button onclick="location.href='index.html'" class="w-full p-4 text-gray-500 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
-            </div>
+        <nav class="w-20 lg:w-64 border-r border-white/5 p-4 flex flex-col space-y-3 glass">
+            <button onclick="showTab('tab-pedidos', this)" class="sidebar-item active w-full p-4 rounded-xl flex justify-center lg:justify-start gap-4">
+                <i class="fa-solid fa-receipt"></i> <span class="hidden lg:block text-[10px] font-black uppercase">Pedidos</span>
+            </button>
+            <button onclick="showTab('tab-inventario', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-4">
+                <i class="fa-solid fa-boxes-stacked"></i> <span class="hidden lg:block text-[10px] font-black uppercase">Stock</span>
+            </button>
+            <button onclick="showTab('tab-add', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-4">
+                <i class="fa-solid fa-plus-circle"></i> <span class="hidden lg:block text-[10px] font-black uppercase">Novo Item</span>
+            </button>
+            <button onclick="showTab('tab-config', this)" class="sidebar-item w-full p-4 rounded-xl flex justify-center lg:justify-start gap-4">
+                <i class="fa-solid fa-sliders"></i> <span class="hidden lg:block text-[10px] font-black uppercase">Definições</span>
+            </button>
         </nav>
 
-        <main class="flex-1 p-6 overflow-y-auto">
-            <div id="tab-pedidos" class="tab-content space-y-4">
-                <h2 class="text-xl font-black italic uppercase">Pedidos Ativos</h2>
-                <div id="lista-pedidos" class="space-y-4"></div>
+        <main class="flex-1 p-8 overflow-y-auto">
+            <div id="tab-pedidos" class="tab-content space-y-6">
+                <h2 class="text-xl font-black uppercase italic">Vendas</h2>
+                <div id="lista-pedidos" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="tab-inventario" class="tab-content hidden space-y-8">
-                <div>
-                    <h2 class="text-xl font-black italic uppercase">Produtos</h2>
-                    <div id="lista-gestao" class="space-y-3 mt-4"></div>
-                </div>
-                <div class="pt-8 border-t border-white/10">
-                    <h2 class="text-xl font-black italic uppercase text-red-600">Secções</h2>
-                    <div id="lista-seccoes-admin" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4"></div>
-                </div>
+            <div id="tab-inventario" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-black uppercase text-red-600">Catálogo</h2>
+                <div id="lista-gestao" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="tab-add" class="tab-content hidden">
-                <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
+                <div class="glass p-8 rounded-[3rem] border border-white/10 max-w-2xl space-y-6">
                     <h2 class="text-sm font-black uppercase text-red-600">Novo Produto</h2>
-                    <input type="text" id="p-nome" placeholder="NOME DO PRODUTO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
-                    <input type="text" id="p-desc" placeholder="DESCRIÇÃO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
-                    <input type="text" id="p-preco" placeholder="PREÇO (MT)" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
+                    <input type="text" id="p-nome" placeholder="NOME DO PRODUTO" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase">
                     
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="p-sec-select" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold uppercase"><option value="">Secção...</option></select>
-                        <input type="text" id="p-sec-nova" placeholder="Nova Secção" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] uppercase font-bold">
+                    <div class="grid grid-cols-2 gap-4">
+                        <select id="p-sec-select" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase"></select>
+                        <input type="text" id="p-sec-nova" placeholder="OU NOVA SECÇÃO" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="p-cat-select" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold uppercase"><option value="">Marca...</option></select>
-                        <input type="text" id="p-cat-nova" placeholder="Nova Marca" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] uppercase font-bold">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <select id="p-cat-select" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase"></select>
+                        <input type="text" id="p-cat-nova" placeholder="OU NOVA MARCA" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase">
                     </div>
 
-                    <input type="file" id="p-foto" accept="image/*" class="text-[10px]">
-                    <button id="btn-salvar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase mt-4">Publicar</button>
+                    <input type="text" id="p-preco" placeholder="PREÇO" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase">
+                    
+                    <textarea id="p-desc" placeholder="DESCRIÇÃO DO PRODUTO (OPCIONAL)" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase h-24"></textarea>
+
+                    <input type="file" id="p-foto" accept="image/*" class="w-full text-[10px] text-gray-500">
+                    <button id="btn-salvar" class="w-full bg-red-600 p-5 rounded-2xl font-black text-xs uppercase">Publicar</button>
                 </div>
             </div>
 
-            <div id="tab-config" class="tab-content hidden space-y-6">
-                <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
-                    <input type="file" id="perfil-foto" accept="image/*" class="text-[10px]">
-                    <button id="btn-perfil" class="w-full bg-white text-black p-4 rounded-xl font-black text-xs uppercase">Logo</button>
-                    <input type="text" id="input-aviso" placeholder="AVISO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold mt-4">
-                    <button id="btn-aviso" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase">Salvar Aviso</button>
+            <div id="tab-config" class="tab-content hidden space-y-10">
+                <div class="glass p-8 rounded-[3rem] border border-red-600/30 max-w-2xl space-y-6">
+                    <div class="border-l-4 border-red-600 pl-4">
+                        <h2 class="text-sm font-black uppercase italic text-white">Adicionar Existente a Marca Existente</h2>
+                        <p class="text-[9px] text-gray-500 uppercase">Selecione e atribua rapidamente</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <select id="copy-prod-select" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase"></select>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <select id="copy-sec-select" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase"></select>
+                            <select id="copy-cat-select" class="w-full p-4 rounded-2xl text-[10px] font-bold uppercase"></select>
+                        </div>
+                        
+                        <button id="btn-copy-move" class="w-full bg-white text-black p-5 rounded-2xl font-black text-[10px] uppercase hover:bg-red-600 hover:text-white transition-all">Confirmar Adição</button>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-[3rem] border border-white/10 max-w-xl space-y-6">
+                    <h2 class="text-sm font-black uppercase text-red-600 italic">Extras</h2>
+                    <input type="text" id="input-aviso" placeholder="AVISO DO BALÃO" class="w-full p-4 rounded-2xl text-[10px] font-bold">
+                    <button id="btn-aviso" class="w-full bg-red-600 p-4 rounded-2xl font-black text-xs uppercase">Salvar Aviso</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="modal-edit-sec" class="fixed inset-0 z-[120] bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 hidden">
-        <div class="bg-[#111] border border-white/10 w-full max-w-md rounded-[2rem] p-8 space-y-4">
-            <h2 class="text-xs font-black uppercase text-red-600">Vincular a Secção:</h2>
-            <select id="edit-sec-select" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold uppercase"></select>
-            <button id="btn-confirm-sec" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase">Salvar</button>
-            <button onclick="document.getElementById('modal-edit-sec').classList.add('hidden')" class="w-full text-[9px] text-gray-500 font-bold uppercase">Fechar</button>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBn8kvmsWdPTc_gSxz5_u-bs3NJrmzwmE0",
@@ -107,7 +121,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let currentEditId = "";
+        let listaProdutosGlobal = [];
 
         window.showTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -116,82 +130,121 @@
             if(btn) btn.classList.add('active');
         };
 
-        onSnapshot(collection(db, "seccoes"), (snap) => {
-            const sels = [document.getElementById('p-sec-select'), document.getElementById('edit-sec-select')];
-            const list = document.getElementById('lista-seccoes-admin');
-            sels.forEach(s => s.innerHTML = '<option value="">Secção...</option>');
-            list.innerHTML = "";
-            snap.forEach(d => {
-                const n = d.data().nome;
-                sels.forEach(s => s.innerHTML += `<option value="${n}">${n}</option>`);
-                list.innerHTML += `<div class="bg-white/5 p-4 rounded-xl flex justify-between items-center text-[10px] font-bold uppercase"><span>${n}</span><button onclick="removerSec('${d.id}')" class="text-red-600"><i class="fa-solid fa-trash"></i></button></div>`;
-            });
-        });
-
-        onSnapshot(collection(db, "categorias"), (snap) => {
-            const s = document.getElementById('p-cat-select');
-            s.innerHTML = '<option value="">Marca...</option>';
-            snap.forEach(d => s.innerHTML += `<option value="${d.data().nome}">${d.data().nome}</option>`);
-        });
-
         onSnapshot(collection(db, "produtos"), (snap) => {
-            const cont = document.getElementById('lista-gestao');
-            cont.innerHTML = "";
+            const grid = document.getElementById('lista-gestao');
+            const sSelect = document.getElementById('p-sec-select');
+            const mSelect = document.getElementById('p-cat-select');
+            const cpProdSelect = document.getElementById('copy-prod-select');
+            const cpSecSelect = document.getElementById('copy-sec-select');
+            const cpCatSelect = document.getElementById('copy-cat-select');
+            
+            let seccoes = new Set();
+            let marcas = new Set();
+            listaProdutosGlobal = [];
+            grid.innerHTML = "";
+            cpProdSelect.innerHTML = '<option value="">-- SELECIONAR PRODUTO --</option>';
+
             snap.forEach(d => {
-                const p = d.data();
-                cont.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-3"><img src="${p.foto}" class="w-10 h-10 rounded-lg object-cover"><div><p class="text-[10px] font-black uppercase">${p.nome}</p><p class="text-[8px] text-red-600 font-bold uppercase italic">${p.seccao || 'Sem Secção'} / ${p.categoria}</p></div></div><div class="flex gap-2"><button onclick="abrirModalSec('${d.id}')" class="text-blue-500 p-2"><i class="fa-solid fa-folder-plus"></i></button><button onclick="removerItem('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash"></i></button></div></div>`;
+                const p = { id: d.id, ...d.data() };
+                listaProdutosGlobal.push(p);
+                if(p.seccao) seccoes.add(p.seccao.trim().toUpperCase());
+                if(p.categoria) marcas.add(p.categoria.trim().toUpperCase());
+
+                grid.innerHTML += `
+                    <div class="glass p-4 rounded-[2rem] flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.foto}" class="w-12 h-12 rounded-xl object-cover">
+                            <div><p class="text-[9px] font-black uppercase">${p.nome}</p><p class="text-[7px] text-red-600 font-bold uppercase">${p.categoria}</p></div>
+                        </div>
+                        <button onclick="removerItem('${d.id}')" class="text-gray-700 hover:text-red-600 p-2 transition-all"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+                
+                cpProdSelect.innerHTML += `<option value="${p.id}">${p.nome} (${p.categoria})</option>`;
             });
+
+            const preencher = (sel, itens, label) => {
+                sel.innerHTML = `<option value="">-- ${label} --</option>`;
+                itens.forEach(i => sel.innerHTML += `<option value="${i}">${i}</option>`);
+            };
+
+            preencher(sSelect, seccoes, "EXISTENTE");
+            preencher(mSelect, marcas, "EXISTENTE");
+            preencher(cpSecSelect, seccoes, "EXISTENTE");
+            preencher(cpCatSelect, marcas, "EXISTENTE");
         });
 
-        window.abrirModalSec = (id) => { currentEditId = id; document.getElementById('modal-edit-sec').classList.remove('hidden'); };
-        document.getElementById('btn-confirm-sec').onclick = async () => {
-            const s = document.getElementById('edit-sec-select').value;
-            if(!s) return;
-            await updateDoc(doc(db, "produtos", currentEditId), { seccao: s });
-            document.getElementById('modal-edit-sec').classList.add('hidden');
+        // ADIÇÃO RÁPIDA (COPIA A DESCRIÇÃO TAMBÉM)
+        document.getElementById('btn-copy-move').onclick = async () => {
+            const pId = document.getElementById('copy-prod-select').value;
+            const novaSec = document.getElementById('copy-sec-select').value;
+            const novaCat = document.getElementById('copy-cat-select').value;
+
+            if(!pId || !novaSec || !novaCat) return alert("Selecione tudo!");
+
+            const original = listaProdutosGlobal.find(p => p.id === pId);
+            
+            if(confirm(`Adicionar "${original.nome}" à marca "${novaCat}"?`)) {
+                await addDoc(collection(db, "produtos"), {
+                    nome: original.nome.trim().toUpperCase(),
+                    preco: original.preco,
+                    descricao: original.descricao || "", 
+                    seccao: novaSec.trim().toUpperCase(),
+                    categoria: novaCat.trim().toUpperCase(),
+                    foto: original.foto,
+                    data: Date.now()
+                });
+                alert("SUCESSO!");
+                location.reload();
+            }
         };
 
-        window.removerItem = async (id) => { if(confirm("Apagar?")) await deleteDoc(doc(db, "produtos", id)); };
-        window.removerSec = async (id) => { if(confirm("Apagar Secção?")) await deleteDoc(doc(db, "seccoes", id)); };
-
+        // SALVAR NOVO COM DESCRIÇÃO
         document.getElementById('btn-salvar').onclick = async () => {
             const n = document.getElementById('p-nome').value.toUpperCase();
             const pr = document.getElementById('p-preco').value;
-            const ds = document.getElementById('p-desc').value.toUpperCase();
-            const sS = document.getElementById('p-sec-select').value;
-            const sN = document.getElementById('p-sec-nova').value.toUpperCase();
-            const cS = document.getElementById('p-cat-select').value;
-            const cN = document.getElementById('p-cat-nova').value.toUpperCase();
+            const desc = document.getElementById('p-desc').value.toUpperCase();
+            const sec = (document.getElementById('p-sec-nova').value || document.getElementById('p-sec-select').value).trim().toUpperCase();
+            const cat = (document.getElementById('p-cat-nova').value || document.getElementById('p-cat-select').value).trim().toUpperCase();
             const f = document.getElementById('p-foto').files[0];
 
-            let secFinal = sN || sS;
-            let catFinal = cN || cS;
-
-            if(!f || !n || !secFinal || !catFinal) return alert("Faltam dados!");
+            if(!f || !n || !sec || !cat) return alert("Preencha os campos obrigatórios!");
 
             const r = new FileReader();
             r.readAsDataURL(f);
             r.onload = async () => {
-                if(sN) await addDoc(collection(db, "seccoes"), { nome: sN });
-                if(cN) await addDoc(collection(db, "categorias"), { nome: cN });
-                await addDoc(collection(db, "produtos"), { nome: n, desc: ds, preco: pr, seccao: secFinal, categoria: catFinal, foto: r.result, data: Date.now() });
+                await addDoc(collection(db, "produtos"), { 
+                    nome: n, 
+                    preco: pr, 
+                    descricao: desc,
+                    seccao: sec, 
+                    categoria: cat, 
+                    foto: r.result, 
+                    data: Date.now() 
+                });
+                alert("PUBLICADO!");
                 location.reload();
             };
         };
 
+        window.removerItem = async (id) => { if(confirm("Apagar?")) await deleteDoc(doc(db, "produtos", id)); };
+        
         onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snap) => {
             const cont = document.getElementById('lista-pedidos');
             cont.innerHTML = "";
             snap.forEach(d => {
                 const p = d.data();
-                cont.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl flex justify-between items-center text-[10px] font-bold uppercase"><div><p class="text-red-600">${p.data}</p><p>${p.itens}</p><p class="text-gray-500">${p.cliente} | ${p.tel}</p></div><button onclick="removerPedido('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
+                cont.innerHTML += `<div class="glass p-5 rounded-[2rem] border-l-4 border-red-600">
+                    <h3 class="text-[10px] font-black uppercase">${p.itens}</h3>
+                    <p class="text-[8px] text-gray-400 font-bold uppercase">${p.cliente} | ${p.tel}</p>
+                    <button onclick="removerPedido('${d.id}')" class="text-[8px] mt-3 text-gray-700">Arquivar</button>
+                </div>`;
             });
         });
         window.removerPedido = async (id) => { await deleteDoc(doc(db, "pedidos", id)); };
 
         document.getElementById('btn-aviso').onclick = async () => {
             await setDoc(doc(db, "config", "main"), { aviso: document.getElementById('input-aviso').value.toUpperCase() }, { merge: true });
-            alert("Salvo!");
+            alert("Aviso salvo!");
         };
     </script>
 </body>
