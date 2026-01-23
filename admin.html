@@ -35,22 +35,19 @@
         </nav>
 
         <main class="flex-1 p-6 overflow-y-auto">
-            
             <div id="tab-pedidos" class="tab-content space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-black italic uppercase">Pedidos Ativos</h2>
-                </div>
+                <h2 class="text-xl font-black italic uppercase">Pedidos Ativos</h2>
                 <div id="lista-pedidos" class="space-y-4"></div>
             </div>
 
             <div id="tab-inventario" class="tab-content hidden space-y-8">
                 <div>
-                    <h2 class="text-xl font-black italic uppercase">Produtos em Loja</h2>
+                    <h2 class="text-xl font-black italic uppercase">Produtos</h2>
                     <div id="lista-gestao" class="space-y-3 mt-4"></div>
                 </div>
                 <div class="pt-8 border-t border-white/10">
-                    <h2 class="text-xl font-black italic uppercase text-red-600">Categorias Ativas</h2>
-                    <div id="lista-categorias-admin" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4"></div>
+                    <h2 class="text-xl font-black italic uppercase text-red-600">Secções</h2>
+                    <div id="lista-seccoes-admin" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4"></div>
                 </div>
             </div>
 
@@ -61,37 +58,43 @@
                     <input type="text" id="p-desc" placeholder="DESCRIÇÃO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
                     <input type="text" id="p-preco" placeholder="PREÇO (MT)" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold">
                     
-                    <div class="space-y-2">
-                        <select id="p-cat-select" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
-                            <option value="">Escolher Categoria Existente</option>
-                        </select>
-                        <input type="text" id="p-cat-nova" placeholder="OU CRIAR NOVA CATEGORIA" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold uppercase">
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="p-sec-select" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold uppercase"><option value="">Secção...</option></select>
+                        <input type="text" id="p-sec-nova" placeholder="Nova Secção" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] uppercase font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="p-cat-select" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold uppercase"><option value="">Marca...</option></select>
+                        <input type="text" id="p-cat-nova" placeholder="Nova Marca" class="bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] uppercase font-bold">
                     </div>
 
-                    <label class="block text-[9px] text-gray-500 uppercase font-bold ml-2">Foto do Produto:</label>
-                    <input type="file" id="p-foto" accept="image/*" class="text-[10px] ml-2">
-                    <button id="btn-salvar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase shadow-lg shadow-red-600/20 mt-4">Publicar Produto</button>
+                    <input type="file" id="p-foto" accept="image/*" class="text-[10px]">
+                    <button id="btn-salvar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase mt-4">Publicar</button>
                 </div>
             </div>
 
             <div id="tab-config" class="tab-content hidden space-y-6">
                 <div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 max-w-xl space-y-4">
-                    <h2 class="text-sm font-black uppercase text-red-600">Aparência Global</h2>
                     <input type="file" id="perfil-foto" accept="image/*" class="text-[10px]">
-                    <button id="btn-perfil" class="w-full bg-white text-black p-4 rounded-xl font-black text-xs uppercase">Atualizar Logo</button>
-                    
-                    <div class="pt-6 border-t border-white/5">
-                        <input type="text" id="input-aviso" placeholder="TEXTO DO BALÃO DE AVISO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white outline-none text-[10px] font-bold mt-2">
-                        <button id="btn-aviso" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase mt-4">Salvar Aviso</button>
-                    </div>
+                    <button id="btn-perfil" class="w-full bg-white text-black p-4 rounded-xl font-black text-xs uppercase">Logo</button>
+                    <input type="text" id="input-aviso" placeholder="AVISO" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold mt-4">
+                    <button id="btn-aviso" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase">Salvar Aviso</button>
                 </div>
             </div>
         </main>
     </div>
 
+    <div id="modal-edit-sec" class="fixed inset-0 z-[120] bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+        <div class="bg-[#111] border border-white/10 w-full max-w-md rounded-[2rem] p-8 space-y-4">
+            <h2 class="text-xs font-black uppercase text-red-600">Vincular a Secção:</h2>
+            <select id="edit-sec-select" class="w-full bg-black border border-white/10 p-4 rounded-xl text-white text-[10px] font-bold uppercase"></select>
+            <button id="btn-confirm-sec" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase">Salvar</button>
+            <button onclick="document.getElementById('modal-edit-sec').classList.add('hidden')" class="w-full text-[9px] text-gray-500 font-bold uppercase">Fechar</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBn8kvmsWdPTc_gSxz5_u-bs3NJrmzwmE0",
@@ -104,6 +107,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let currentEditId = "";
 
         window.showTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -112,123 +116,83 @@
             if(btn) btn.classList.add('active');
         };
 
-        // --- GESTÃO DE PEDIDOS (COM FUNÇÃO DE ELIMINAR) ---
-        onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
-            const container = document.getElementById('lista-pedidos');
-            container.innerHTML = "";
-            snapshot.forEach(d => {
+        onSnapshot(collection(db, "seccoes"), (snap) => {
+            const sels = [document.getElementById('p-sec-select'), document.getElementById('edit-sec-select')];
+            const list = document.getElementById('lista-seccoes-admin');
+            sels.forEach(s => s.innerHTML = '<option value="">Secção...</option>');
+            list.innerHTML = "";
+            snap.forEach(d => {
+                const n = d.data().nome;
+                sels.forEach(s => s.innerHTML += `<option value="${n}">${n}</option>`);
+                list.innerHTML += `<div class="bg-white/5 p-4 rounded-xl flex justify-between items-center text-[10px] font-bold uppercase"><span>${n}</span><button onclick="removerSec('${d.id}')" class="text-red-600"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+        });
+
+        onSnapshot(collection(db, "categorias"), (snap) => {
+            const s = document.getElementById('p-cat-select');
+            s.innerHTML = '<option value="">Marca...</option>';
+            snap.forEach(d => s.innerHTML += `<option value="${d.data().nome}">${d.data().nome}</option>`);
+        });
+
+        onSnapshot(collection(db, "produtos"), (snap) => {
+            const cont = document.getElementById('lista-gestao');
+            cont.innerHTML = "";
+            snap.forEach(d => {
                 const p = d.data();
-                container.innerHTML += `
-                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex justify-between items-start">
-                    <div class="space-y-1">
-                        <p class="text-[8px] text-red-600 font-bold uppercase italic">${p.data}</p>
-                        <h3 class="font-black text-white text-sm uppercase">${p.itens}</h3>
-                        <p class="text-[10px] text-gray-500 uppercase font-bold">CLIENTE: ${p.cliente} | TEL: ${p.tel}</p>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-tighter">LOCAL: ${p.local} | QTD: ${p.qtd}</p>
-                    </div>
-                    <button onclick="removerPedido('${d.id}')" class="bg-red-600/10 text-red-600 p-3 rounded-2xl hover:bg-red-600 hover:text-white transition-all">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>`;
+                cont.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-3"><img src="${p.foto}" class="w-10 h-10 rounded-lg object-cover"><div><p class="text-[10px] font-black uppercase">${p.nome}</p><p class="text-[8px] text-red-600 font-bold uppercase italic">${p.seccao || 'Sem Secção'} / ${p.categoria}</p></div></div><div class="flex gap-2"><button onclick="abrirModalSec('${d.id}')" class="text-blue-500 p-2"><i class="fa-solid fa-folder-plus"></i></button><button onclick="removerItem('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash"></i></button></div></div>`;
             });
         });
 
-        window.removerPedido = async (id) => {
-            if(confirm("Deseja apagar este pedido do histórico?")) {
-                await deleteDoc(doc(db, "pedidos", id));
-            }
+        window.abrirModalSec = (id) => { currentEditId = id; document.getElementById('modal-edit-sec').classList.remove('hidden'); };
+        document.getElementById('btn-confirm-sec').onclick = async () => {
+            const s = document.getElementById('edit-sec-select').value;
+            if(!s) return;
+            await updateDoc(doc(db, "produtos", currentEditId), { seccao: s });
+            document.getElementById('modal-edit-sec').classList.add('hidden');
         };
 
-        // --- GESTÃO DE CATEGORIAS ---
-        onSnapshot(collection(db, "categorias"), (snapshot) => {
-            const select = document.getElementById('p-cat-select');
-            const listaAdmin = document.getElementById('lista-categorias-admin');
-            select.innerHTML = `<option value="">Escolher Categoria Existente</option>`;
-            listaAdmin.innerHTML = "";
-            snapshot.forEach(d => {
-                const cat = d.data().nome;
-                select.innerHTML += `<option value="${cat}">${cat}</option>`;
-                listaAdmin.innerHTML += `
-                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] font-black uppercase tracking-widest">${cat}</span>
-                    <button onclick="removerCategoria('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash-can"></i></button>
-                </div>`;
-            });
-        });
+        window.removerItem = async (id) => { if(confirm("Apagar?")) await deleteDoc(doc(db, "produtos", id)); };
+        window.removerSec = async (id) => { if(confirm("Apagar Secção?")) await deleteDoc(doc(db, "seccoes", id)); };
 
-        window.removerCategoria = async (id) => {
-            if(confirm("Remover esta categoria?")) { await deleteDoc(doc(db, "categorias", id)); }
-        };
-
-        // --- GESTÃO DE PRODUTOS ---
-        onSnapshot(collection(db, "produtos"), (snapshot) => {
-            const container = document.getElementById('lista-gestao');
-            container.innerHTML = "";
-            snapshot.forEach(d => {
-                const p = d.data();
-                container.innerHTML += `
-                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <div class="flex items-center gap-4">
-                        <img src="${p.foto}" class="w-12 h-12 rounded-xl object-cover">
-                        <div>
-                            <p class="text-[10px] font-black uppercase">${p.nome}</p>
-                            <p class="text-[8px] text-red-600 font-bold uppercase">${p.categoria || 'Geral'}</p>
-                        </div>
-                    </div>
-                    <button onclick="removerItem('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash-can"></i></button>
-                </div>`;
-            });
-        });
-
-        window.removerItem = async (id) => {
-            if(confirm("Apagar produto da loja?")) { await deleteDoc(doc(db, "produtos", id)); }
-        };
-
-        // --- PUBLICAR PRODUTO ---
         document.getElementById('btn-salvar').onclick = async () => {
-            const nome = document.getElementById('p-nome').value.toUpperCase();
-            const desc = document.getElementById('p-desc').value.toUpperCase();
-            const preco = document.getElementById('p-preco').value;
-            const catSelect = document.getElementById('p-cat-select').value;
-            const catNova = document.getElementById('p-cat-nova').value.toUpperCase().trim();
-            const file = document.getElementById('p-foto').files[0];
-            let categoriaFinal = catNova || catSelect;
+            const n = document.getElementById('p-nome').value.toUpperCase();
+            const pr = document.getElementById('p-preco').value;
+            const ds = document.getElementById('p-desc').value.toUpperCase();
+            const sS = document.getElementById('p-sec-select').value;
+            const sN = document.getElementById('p-sec-nova').value.toUpperCase();
+            const cS = document.getElementById('p-cat-select').value;
+            const cN = document.getElementById('p-cat-nova').value.toUpperCase();
+            const f = document.getElementById('p-foto').files[0];
 
-            if(!file || !nome || !preco || !categoriaFinal) return alert("Dados incompletos!");
+            let secFinal = sN || sS;
+            let catFinal = cN || cS;
 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                if(catNova) { await addDoc(collection(db, "categorias"), { nome: catNova }); }
-                await addDoc(collection(db, "produtos"), {
-                    nome, desc, preco, categoria: categoriaFinal, foto: reader.result, dataCriacao: Date.now()
-                });
-                alert("Publicado com sucesso!");
+            if(!f || !n || !secFinal || !catFinal) return alert("Faltam dados!");
+
+            const r = new FileReader();
+            r.readAsDataURL(f);
+            r.onload = async () => {
+                if(sN) await addDoc(collection(db, "seccoes"), { nome: sN });
+                if(cN) await addDoc(collection(db, "categorias"), { nome: cN });
+                await addDoc(collection(db, "produtos"), { nome: n, desc: ds, preco: pr, seccao: secFinal, categoria: catFinal, foto: r.result, data: Date.now() });
                 location.reload();
             };
         };
 
-        // --- LOGO E AVISO ---
-        document.getElementById('btn-perfil').onclick = async () => {
-            const file = document.getElementById('perfil-foto').files[0];
-            if(!file) return alert("Selecione uma imagem!");
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                await setDoc(doc(db, "config", "main"), { logo: reader.result }, { merge: true });
-                alert("Logo atualizada!");
-            };
-        };
+        onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snap) => {
+            const cont = document.getElementById('lista-pedidos');
+            cont.innerHTML = "";
+            snap.forEach(d => {
+                const p = d.data();
+                cont.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl flex justify-between items-center text-[10px] font-bold uppercase"><div><p class="text-red-600">${p.data}</p><p>${p.itens}</p><p class="text-gray-500">${p.cliente} | ${p.tel}</p></div><button onclick="removerPedido('${d.id}')" class="text-red-600 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+        });
+        window.removerPedido = async (id) => { await deleteDoc(doc(db, "pedidos", id)); };
 
         document.getElementById('btn-aviso').onclick = async () => {
-            const txt = document.getElementById('input-aviso').value;
-            await setDoc(doc(db, "config", "main"), { aviso: txt }, { merge: true });
-            alert("Aviso salvo!");
+            await setDoc(doc(db, "config", "main"), { aviso: document.getElementById('input-aviso').value.toUpperCase() }, { merge: true });
+            alert("Salvo!");
         };
-
-        onSnapshot(doc(db, "config", "main"), (d) => {
-            if(d.exists() && d.data().logo) document.getElementById('logo-admin').src = d.data().logo;
-        });
     </script>
 </body>
 </html>
