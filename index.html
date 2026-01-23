@@ -8,97 +8,128 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .dream-bubble { position: relative; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 50px; padding: 15px 25px; border: 1px solid rgba(255,255,255,0.1); margin: 20px; display: inline-block; }
-        .dream-bubble::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.1); border-radius: 50%; width: 15px; height: 15px; bottom: -20px; left: 30px; }
-        .hidden { display: none; }
-        .cat-btn.active { background: #dc2626; color: white; border-color: #dc2626; }
         
-        /* ANIMAÇÃO DE ENTRADA E SAÍDA (SCROLL DINÂMICO) */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px) scale(0.9);
-            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            visibility: hidden;
+        /* CORES PADRÃO DO PROJETO */
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #050505; /* Preto do fundo */
+            color: white; 
+            overflow-x: hidden; 
         }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            visibility: visible;
+
+        .glass { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
         }
+
+        /* VERMELHO PADRÃO AFS */
+        .btn-filtro.active { 
+            background: #dc2626; 
+            color: white; 
+            border-color: #dc2626; 
+        }
+
+        .text-afs-red { color: #dc2626; }
+        .bg-afs-red { background-color: #dc2626; }
+
+        .hidden { display: none; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* BOTÃO WHATSAPP FLUTUANTE */
+        .btn-whatsapp {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background-color: #25d366; /* Verde WhatsApp */
+            color: white;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+            z-index: 99;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        .btn-whatsapp:active { transform: scale(0.9); }
     </style>
 </head>
 <body class="pb-32">
 
-    <header class="p-6 sticky top-0 z-50 glass border-b-0 rounded-b-[2.5rem]">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <img id="logo-markt" src="logo.png" class="h-14 w-14 rounded-full border-2 border-red-600 bg-white object-contain p-1">
-                <div>
-                    <h1 class="text-[10px] uppercase tracking-[0.2em] text-gray-500 leading-none">Bem-vindo(a)</h1>
-                    <p class="text-lg font-extrabold mt-1 uppercase italic"><span class="text-red-600">AFS</span> Multiservice</p>
-                </div>
+    <a href="https://wa.me/258846261950?text=Saudações%20AFS%20MULTISERVICE,%20Vim%20do%20marketplace." target="_blank" class="btn-whatsapp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <header class="p-6 sticky top-0 z-50 glass rounded-b-[2.5rem]">
+        <div class="flex items-center gap-4">
+            <img id="logo-markt" src="logo.png" class="h-14 w-14 rounded-full border-2 border-red-600 bg-white object-contain p-1">
+            <div>
+                <h1 class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Bem-vindo (a)</h1>
+                <p class="text-lg font-extrabold uppercase italic leading-tight">
+                    <span class="text-red-600">AFS</span> MARKETPLACE
+                </p>
             </div>
         </div>
     </header>
 
     <div class="px-6 mt-6 space-y-4">
+        <div id="lista-seccoes" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <button onclick="setSec('TODOS', this)" class="btn-filtro active flex-shrink-0 px-5 py-2 rounded-xl border border-white/10 text-[9px] font-black uppercase">TODOS</button>
+        </div>
+
+        <div id="lista-marcas" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"></div>
+
         <div class="glass flex items-center px-4 py-3 rounded-2xl border border-white/10">
             <i class="fa-solid fa-magnifying-glass text-gray-500 mr-3 text-sm"></i>
-            <input type="text" id="input-busca" onkeyup="buscarLocal()" placeholder="PESQUISAR..." class="bg-transparent w-full text-[10px] font-bold outline-none uppercase text-white">
-        </div>
-        
-        <div id="lista-categorias" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button onclick="filtrarCategoria('TODOS', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest transition-all">TODOS</button>
+            <input type="text" id="input-busca" onkeyup="buscar()" placeholder="PESQUISAR PRODUTO..." class="bg-transparent w-full text-[10px] font-bold outline-none uppercase text-white">
         </div>
     </div>
 
-    <div class="flex justify-center mt-2">
-        <div class="dream-bubble">
-            <p id="txt-aviso" class="text-[9px] font-bold uppercase tracking-widest text-white text-center italic">Carregando...</p>
-        </div>
+    <div class="flex justify-center mt-4 px-6">
+        <p id="txt-aviso" class="text-[9px] font-bold uppercase tracking-widest text-white italic bg-white/5 px-6 py-2 rounded-full border border-white/10 text-center w-full">Carregando...</p>
     </div>
 
-    <section id="produtos-grid" class="p-6 grid grid-cols-2 gap-5">
-        </section>
+    <section id="produtos-grid" class="p-6 grid grid-cols-2 gap-5"></section>
 
     <nav class="fixed bottom-8 left-6 right-6 h-16 glass rounded-[2rem] flex justify-around items-center px-4 shadow-2xl border border-white/10">
         <i onclick="location.reload()" class="fa-solid fa-house-chimney text-red-600 text-lg cursor-pointer"></i>
-        <div class="relative" onclick="window.abrirCarrinhoUI()">
+        <div class="relative cursor-pointer" onclick="abrirCarrinho()">
             <i class="fa-solid fa-cart-shopping text-gray-500 text-lg"></i>
             <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
         </div>
         <i onclick="location.href='login.html'" class="fa-regular fa-user text-gray-500 text-lg cursor-pointer"></i>
     </nav>
 
-    <div id="toast" class="fixed bottom-28 left-6 right-6 bg-red-600 p-4 rounded-2xl text-[10px] font-bold text-center z-50 hidden">Adicionado ao carrinho!</div>
-
     <div id="modal-carrinho" class="fixed inset-0 z-[100] glass flex items-end justify-center hidden">
-        <div class="bg-[#0a0a0a] w-full max-h-[80vh] rounded-t-[3rem] p-8 overflow-y-auto border-t border-white/10 shadow-2xl">
+        <div class="bg-[#0a0a0a] w-full max-h-[80vh] rounded-t-[3rem] p-8 overflow-y-auto border-t border-white/10">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black italic uppercase">Meu Carrinho</h2>
-                <button onclick="document.getElementById('modal-carrinho').classList.add('hidden')"><i class="fa-solid fa-xmark text-xl text-gray-500"></i></button>
+                <h2 class="text-xl font-black uppercase italic">Carrinho</h2>
+                <button onclick="document.getElementById('modal-carrinho').classList.add('hidden')"><i class="fa-solid fa-xmark text-gray-500"></i></button>
             </div>
             <div id="lista-carrinho" class="space-y-4 mb-8"></div>
-            <button onclick="abrirCheckout()" class="w-full bg-red-600 p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest">Finalizar Compra</button>
+            <button onclick="abrirCheckout()" class="w-full bg-red-600 p-5 rounded-2xl font-black text-[10px] uppercase">Finalizar Compra</button>
         </div>
     </div>
 
     <div id="modal-checkout" class="fixed inset-0 z-[110] glass flex items-center justify-center p-6 hidden">
         <div class="bg-black border border-white/10 w-full rounded-[2.5rem] p-8 space-y-4">
-            <h2 class="text-xl font-black italic uppercase text-red-600">Entrega</h2>
-            <input type="text" id="f-nome" placeholder="SEU NOME" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold border border-white/5 outline-none text-white">
-            <input type="number" id="f-tel" placeholder="SEU NÚMERO" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold border border-white/5 outline-none text-white">
-            <input type="number" id="f-qtd" placeholder="QUANTIDADES" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold border border-white/5 outline-none text-white">
-            <input type="text" id="f-local" placeholder="LOCAL" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold border border-white/5 outline-none text-white">
-            <button id="btn-finalizar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase">Confirmar</button>
+            <h2 class="text-xl font-black italic uppercase text-red-600 text-center">Entrega</h2>
+            <input type="text" id="f-nome" placeholder="SEU NOME" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold outline-none text-white border border-white/5 uppercase">
+            <input type="number" id="f-tel" placeholder="SEU NÚMERO" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold outline-none text-white border border-white/5">
+            <input type="text" id="f-local" placeholder="LOCAL" class="w-full bg-white/5 p-4 rounded-xl text-[10px] font-bold outline-none text-white border border-white/5 uppercase">
+            <button id="btn-finalizar" class="w-full bg-red-600 p-4 rounded-xl font-black text-xs uppercase">Confirmar Pedido</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBn8kvmsWdPTc_gSxz5_u-bs3NJrmzwmE0",
@@ -111,100 +142,83 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let carrinho = [];
+        let secAtiva = "TODOS", marcaAtiva = "TODOS", carrinho = [];
 
-        // --- LÓGICA DE ANIMAÇÃO AO SUBIR E DESCER ---
-        const observerOptions = { threshold: 0.1 };
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                } else {
-                    entry.target.classList.remove('active'); // Remove para animar de novo ao voltar
-                }
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
+        });
+
+        // Lógica de Secções e Marcas
+        onSnapshot(collection(db, "seccoes"), (snap) => {
+            const cont = document.getElementById('lista-seccoes');
+            cont.innerHTML = `<button onclick="setSec('TODOS', this)" class="btn-filtro active flex-shrink-0 px-5 py-2 rounded-xl border border-white/10 text-[9px] font-black uppercase">TODOS</button>`;
+            snap.forEach(d => {
+                cont.innerHTML += `<button onclick="setSec('${d.data().nome}', this)" class="btn-filtro flex-shrink-0 px-5 py-2 rounded-xl border border-white/10 text-[9px] font-black uppercase">${d.data().nome}</button>`;
             });
-        }, observerOptions);
+        });
 
-        function carregarProdutos(catFiltrada = "TODOS") {
-            const grid = document.getElementById('produtos-grid');
-            onSnapshot(collection(db, "produtos"), (snapshot) => {
-                grid.innerHTML = "";
-                let categoriasMap = {};
+        window.setSec = (s, btn) => {
+            secAtiva = s; marcaAtiva = "TODOS";
+            document.querySelectorAll('#lista-seccoes .btn-filtro').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carregarMarcas();
+            carregarProdutos();
+        };
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const cat = data.categoria || "GERAL";
-                    if(catFiltrada === "TODOS" || cat === catFiltrada) {
-                        if (!categoriasMap[cat]) categoriasMap[cat] = [];
-                        categoriasMap[cat].push({...data, id: doc.id});
-                    }
+        function carregarMarcas() {
+            const cont = document.getElementById('lista-marcas');
+            if(secAtiva === "TODOS") { cont.innerHTML = ""; return; }
+            onSnapshot(collection(db, "produtos"), (snap) => {
+                let marcas = new Set();
+                snap.forEach(d => { if(d.data().seccao === secAtiva) marcas.add(d.data().categoria); });
+                cont.innerHTML = ""; 
+                marcas.forEach(m => {
+                    cont.innerHTML += `<button onclick="setMarca('${m}', this)" class="btn-filtro flex-shrink-0 px-4 py-1.5 rounded-lg border border-white/5 text-[8px] font-black uppercase">${m}</button>`;
                 });
-
-                for (let categoria in categoriasMap) {
-                    const title = document.createElement('div');
-                    title.className = "col-span-2 mt-4 mb-2 border-l-4 border-red-600 pl-3 reveal";
-                    title.innerHTML = `<h2 class="text-sm font-black text-white uppercase italic tracking-widest">${categoria}</h2>`;
-                    grid.appendChild(title);
-                    observer.observe(title); // Começa a observar o título
-
-                    categoriasMap[categoria].forEach(p => {
-                        const card = document.createElement('div');
-                        card.className = "bg-[#0f0f0f] border border-white/5 rounded-[2.5rem] p-4 flex flex-col justify-between reveal";
-                        card.innerHTML = `
-                            <div>
-                                <div class="bg-black rounded-[2rem] h-32 mb-4 overflow-hidden"><img src="${p.foto}" class="h-full w-full object-cover"></div>
-                                <h3 class="text-[11px] font-extrabold uppercase leading-tight">${p.nome}</h3>
-                                <p class="text-[9px] text-gray-500 font-medium mt-1">${p.desc || ''}</p>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <p class="text-red-600 font-black text-xs italic">${p.preco} MT</p>
-                                <button onclick="window.addCart('${p.nome}', '${p.preco}', '${p.foto}')" class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-plus text-white text-[10px]"></i></button>
-                            </div>`;
-                        grid.appendChild(card);
-                        observer.observe(card); // Começa a observar o card
-                    });
-                }
             });
         }
 
-        // --- RESTANTE DAS FUNÇÕES (CATEGORIAS, CONFIG, CARRINHO) ---
-        onSnapshot(collection(db, "categorias"), (snapshot) => {
-            const container = document.getElementById('lista-categorias');
-            container.innerHTML = `<button onclick="filtrarCategoria('TODOS', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest transition-all">TODOS</button>`;
-            snapshot.forEach(doc => {
-                const cat = doc.data().nome;
-                container.innerHTML += `<button onclick="filtrarCategoria('${cat}', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest transition-all">${cat}</button>`;
-            });
-        });
-
-        window.filtrarCategoria = (cat, btn) => {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        window.setMarca = (m, btn) => {
+            marcaAtiva = m;
+            document.querySelectorAll('#lista-marcas .btn-filtro').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            carregarProdutos(cat);
+            carregarProdutos();
         };
 
-        onSnapshot(collection(db, "config"), (snapshot) => {
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if(data.aviso) document.getElementById('txt-aviso').innerText = data.aviso;
-                if(data.logo) document.getElementById('logo-markt').src = data.logo;
+        function carregarProdutos() {
+            const grid = document.getElementById('produtos-grid');
+            onSnapshot(collection(db, "produtos"), (snap) => {
+                grid.innerHTML = "";
+                snap.forEach(d => {
+                    const p = d.data();
+                    if((secAtiva === "TODOS" || p.seccao === secAtiva) && (marcaAtiva === "TODOS" || p.categoria === marcaAtiva)) {
+                        const card = document.createElement('div');
+                        card.className = "bg-[#0f0f0f] border border-white/5 rounded-[2rem] p-4 reveal product-card";
+                        card.innerHTML = `
+                            <img src="${p.foto}" class="h-32 w-full object-cover rounded-[1.5rem] mb-3">
+                            <h3 class="text-[10px] font-black uppercase leading-tight">${p.nome}</h3>
+                            <div class="mt-3 flex justify-between items-center">
+                                <p class="text-red-600 font-black text-[10px] italic">${p.preco} MT</p>
+                                <button onclick="addCart('${p.nome}', '${p.preco}', '${p.foto}')" class="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-plus text-white text-[9px]"></i></button>
+                            </div>`;
+                        grid.appendChild(card);
+                        observer.observe(card);
+                    }
+                });
             });
-        });
+        }
 
         window.addCart = (nome, preco, foto) => {
             carrinho.push({nome, preco, foto});
             document.getElementById('cart-count').innerText = carrinho.length;
-            const t = document.getElementById('toast');
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
         };
 
-        window.abrirCarrinhoUI = () => {
-            if(carrinho.length === 0) return alert("Vazio!");
-            const lista = document.getElementById('lista-carrinho');
-            lista.innerHTML = "";
+        window.abrirCarrinho = () => {
+            if(carrinho.length === 0) return alert("Carrinho vazio!");
+            const list = document.getElementById('lista-carrinho');
+            list.innerHTML = "";
             carrinho.forEach(item => {
-                lista.innerHTML += `<div class="bg-white/5 p-4 rounded-xl flex items-center gap-3"><img src="${item.foto}" class="w-10 h-10 rounded object-cover"><p class="text-[10px] font-bold">${item.nome}</p></div>`;
+                list.innerHTML += `<div class="bg-white/5 p-3 rounded-xl flex items-center gap-3 border border-white/5"><img src="${item.foto}" class="w-10 h-10 rounded object-cover"><p class="text-[9px] font-bold uppercase">${item.nome}</p></div>`;
             });
             document.getElementById('modal-carrinho').classList.remove('hidden');
         };
@@ -215,27 +229,24 @@
         };
 
         document.getElementById('btn-finalizar').onclick = async () => {
-            const pedido = {
-                cliente: document.getElementById('f-nome').value,
-                tel: document.getElementById('f-tel').value,
-                qtd: document.getElementById('f-qtd').value,
-                local: document.getElementById('f-local').value,
-                itens: carrinho.map(c => c.nome).join(", "),
-                data: new Date().toLocaleString()
-            };
-            await addDoc(collection(db, "pedidos"), pedido);
-            alert("Pedido Enviado!");
+            const ped = { cliente: document.getElementById('f-nome').value.toUpperCase(), tel: document.getElementById('f-tel').value, local: document.getElementById('f-local').value.toUpperCase(), itens: carrinho.map(c => c.nome).join(", "), data: new Date().toLocaleString() };
+            if(!ped.cliente || !ped.tel) return alert("Preencha os dados!");
+            await addDoc(collection(db, "pedidos"), ped);
+            alert("PEDIDO ENVIADO!");
             location.reload();
         };
 
-        window.buscarLocal = () => {
-            let busca = document.getElementById('input-busca').value.toUpperCase();
-            let cards = document.querySelectorAll('.reveal');
-            cards.forEach(card => {
-                let h3 = card.querySelector('h3');
-                if(h3) {
-                    card.style.display = h3.innerText.toUpperCase().includes(busca) ? "" : "none";
-                }
+        onSnapshot(doc(db, "config", "main"), (d) => {
+            if(d.exists()) {
+                if(d.data().aviso) document.getElementById('txt-aviso').innerText = d.data().aviso;
+                if(d.data().logo) document.getElementById('logo-markt').src = d.data().logo;
+            }
+        });
+
+        window.buscar = () => {
+            let b = document.getElementById('input-busca').value.toUpperCase();
+            document.querySelectorAll('.product-card').forEach(c => {
+                c.style.display = c.innerText.toUpperCase().includes(b) ? "" : "none";
             });
         };
 
@@ -243,4 +254,3 @@
     </script>
 </body>
 </html>
-
